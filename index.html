@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bio Link</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://googleapis.com" rel="stylesheet">
+    <title>Bio Link | vazyann</title>
+    <link rel="preconnect" href="https://googleapis.com">
+    <link rel="preconnect" href="https://gstatic.com" crossorigin>
+    <link href="https://googleapis.com/css2?family=Inter:wght@400;600;700&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg-image: url('bg.png');
@@ -18,13 +18,15 @@
             --card-border-hover: rgba(255, 26, 26, 0.6);
             --text-main: #ffffff;
             --text-muted: #cfabab;
+            --player-accent: #ff3b3b;
+            --player-accent-glow: rgba(255, 59, 59, 0.4);
+            --player-line: rgba(255, 26, 26, 0.15);
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Inter', sans-serif;
         }
 
         body {
@@ -44,6 +46,43 @@
             padding: 20px;
             overflow-x: hidden;
             position: relative;
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Экран заставки */
+        #overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000000;
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        #overlay.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .overlay-text {
+            font-family: 'Outfit', sans-serif;
+            font-size: 14px;
+            letter-spacing: 2px;
+            color: var(--text-main);
+            text-transform: uppercase;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.4; }
+            50% { opacity: 1; }
+            100% { opacity: 0.4; }
         }
 
         .container {
@@ -150,9 +189,103 @@
         .link-item:active {
             transform: translateY(0);
         }
+
+        .advanced-player {
+            margin-top: 35px;
+            padding-top: 25px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            text-align: left;
+        }
+
+        .track-info {
+            font-family: 'Outfit', sans-serif;
+            font-size: 15px;
+            color: var(--text-main);
+            font-weight: 600;
+            margin-bottom: 12px;
+            letter-spacing: 0.5px;
+            text-shadow: 0 0 10px rgba(255, 59, 59, 0.2);
+        }
+
+        .player-controls-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .time-stamp {
+            font-family: 'Outfit', sans-serif;
+            font-size: 11px;
+            color: var(--text-muted);
+            min-width: 35px;
+            font-weight: 600;
+            opacity: 0.8;
+        }
+
+        .progress-bar-container {
+            flex-grow: 1;
+            height: 4px;
+            background: var(--player-line);
+            position: relative;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end));
+            border-radius: 4px;
+            box-shadow: 0 0 8px var(--player-accent-glow);
+        }
+
+        .buttons-group {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-left: 6px;
+        }
+
+        .player-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .player-btn svg {
+            width: 14px;
+            height: 14px;
+            fill: var(--text-muted);
+            transition: fill 0.2s, filter 0.2s;
+        }
+
+        .player-btn:hover svg {
+            fill: var(--player-accent);
+            filter: drop-shadow(0 0 4px var(--player-accent-glow));
+        }
+
+        .player-btn.main-toggle svg {
+            width: 18px;
+            height: 18px;
+            fill: var(--text-main);
+        }
+
+        .player-btn.main-toggle:hover svg {
+            fill: var(--player-accent);
+        }
     </style>
 </head>
 <body>
+
+    <div id="overlay">
+        <div class="overlay-text">pressssss enterr</div>
+    </div>
+
+    <audio id="audio-track" src="track.mp3" preload="metadata" loop></audio>
 
     <div class="container">
         <div class="avatar-wrapper">
@@ -166,14 +299,118 @@
         <p class="bio">тестирую с созданием профиля</p>
 
         <div class="links-list">
-            <a href="https://t.me/nz0xt" target="_blank" class="link-item">
+            <a href="https://t.me" target="_blank" class="link-item">
                 <svg viewBox="0 0 24 24">
                     <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.19-.04-.27-.02-.11.02-1.93 1.23-5.46 3.62-.51.35-.98.53-1.39.51-.46-.01-1.35-.26-2.01-.48-.81-.27-1.46-.42-1.4-.88.03-.24.36-.49.99-.75 3.88-1.69 6.46-2.8 7.74-3.32 3.69-1.5 4.45-1.76 4.95-1.77.11 0 .36.03.52.16.13.11.17.27.18.38.01.07.02.22.01.37z"/>
                 </svg>
                 Telegram
             </a>
         </div>
+
+        <div class="advanced-player">
+            <div class="track-info" id="track-name">onda andar — prop hunt</div>
+            
+            <div class="player-controls-row">
+                <span class="time-stamp" id="current-time">0:00</span>
+                
+                <div class="progress-bar-container" id="progress-container">
+                    <div class="progress-bar-fill" id="progress-fill"></div>
+                </div>
+                
+                <span class="time-stamp" id="duration-time">0:00</span>
+                
+                <div class="buttons-group">
+                    <button class="player-btn main-toggle" id="play-btn" title="Воспроизведение">
+                        <svg viewBox="0 0 24 24" id="play-icon" style="display: none;">
+                            <path d="M8 5v14l11-7z"/>
+                        </svg>
+                        <svg viewBox="0 0 24 24" id="pause-icon">
+                            <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 
+    <script>
+        const audio = document.getElementById('audio-track');
+        const playBtn = document.getElementById('play-btn');
+        const playIcon = document.getElementById('play-icon');
+        const pauseIcon = document.getElementById('pause-icon');
+        const progressContainer = document.getElementById('progress-container');
+        const progressFill = document.getElementById('progress-fill');
+        const currentTimeEl = document.getElementById('current-time');
+        const durationTimeEl = document.getElementById('duration-time');
+        const overlay = document.getElementById('overlay');
+
+        function startAudio() {
+            audio.play().then(() => {
+                playIcon.style.display = 'none';
+                pauseIcon.style.display = 'block';
+                overlay.classList.add('hidden');
+            }).catch(error => {
+                console.log("Автозапуск заблокирован браузером. Ожидаем клика пользователя.");
+            });
+        }
+
+        overlay.addEventListener('click', () => {
+            audio.play();
+            playIcon.style.display = 'none';
+            pauseIcon.style.display = 'block';
+            overlay.classList.add('hidden');
+        });
+
+        window.addEventListener('load', () => {
+            startAudio();
+            if (audio.duration) {
+                durationTimeEl.textContent = formatTime(audio.duration);
+            }
+        });
+
+        playBtn.addEventListener('click', () => {
+            if (audio.paused) {
+                audio.play();
+                playIcon.style.display = 'none';
+                pauseIcon.style.display = 'block';
+            } else {
+                audio.pause();
+                playIcon.style.display = 'block';
+                pauseIcon.style.display = 'none';
+            }
+        });
+
+        function formatTime(time) {
+            if (isNaN(time) || !isFinite(time)) return "0:00";
+            const minutes = Math.floor(time / 60);
+            const seconds = Math.floor(time % 60);
+            return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+        }
+
+        audio.addEventListener('loadedmetadata', () => {
+            durationTimeEl.textContent = formatTime(audio.duration);
+        });
+
+        audio.addEventListener('durationchange', () => {
+            durationTimeEl.textContent = formatTime(audio.duration);
+        });
+
+        audio.addEventListener('timeupdate', () => {
+            if (audio.duration) {
+                const percent = (audio.currentTime / audio.duration) * 100;
+                progressFill.style.width = `${percent}%`;
+            }
+            currentTimeEl.textContent = formatTime(audio.currentTime);
+        });
+
+        progressContainer.addEventListener('click', (e) => {
+            const width = progressContainer.clientWidth;
+            const clickX = e.offsetX;
+            const duration = audio.duration;
+            if (duration && isFinite(duration)) {
+                audio.currentTime = (clickX / width) * duration;
+            }
+        });
+    </script>
 </body>
 </html>
