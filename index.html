@@ -2,8 +2,8 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bio Link | vazyann</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>vazyann bio</title>
     <link rel="preconnect" href="https://googleapis.com">
     <link rel="preconnect" href="https://gstatic.com" crossorigin>
     <link href="https://googleapis.com/css2?family=Inter:wght@400;600;700&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
@@ -47,42 +47,45 @@
             overflow-x: hidden;
             position: relative;
             font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        /* Экран заставки */
-        #overlay {
+        #intro-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             background: #000000;
-            z-index: 9999;
             display: flex;
             justify-content: center;
             align-items: center;
+            z-index: 9999;
             cursor: pointer;
-            transition: opacity 0.5s ease, visibility 0.5s ease;
+            transition: opacity 0.5s ease, visibility 0.5s;
         }
 
-        #overlay.hidden {
+        #intro-overlay.hidden {
             opacity: 0;
             visibility: hidden;
+            pointer-events: none;
         }
 
-        .overlay-text {
+        .intro-text {
             font-family: 'Outfit', sans-serif;
-            font-size: 14px;
-            letter-spacing: 2px;
-            color: var(--text-main);
+            font-size: 16px;
+            font-weight: 600;
+            letter-spacing: 4px;
+            color: #ffffff;
             text-transform: uppercase;
-            animation: pulse 2s infinite;
+            animation: pulse 1.8s infinite ease-in-out;
+            text-shadow: 0 0 10px rgba(255, 59, 59, 0.5);
         }
 
         @keyframes pulse {
-            0% { opacity: 0.4; }
-            50% { opacity: 1; }
-            100% { opacity: 0.4; }
+            0% { opacity: 0.3; transform: scale(0.98); }
+            50% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0.3; transform: scale(0.98); }
         }
 
         .container {
@@ -224,11 +227,19 @@
 
         .progress-bar-container {
             flex-grow: 1;
-            height: 4px;
-            background: var(--player-line);
+            height: 14px;
+            display: flex;
+            align-items: center;
             position: relative;
             cursor: pointer;
+        }
+
+        .progress-bar-bg {
+            width: 100%;
+            height: 4px;
+            background: var(--player-line);
             border-radius: 4px;
+            position: relative;
         }
 
         .progress-bar-fill {
@@ -250,7 +261,7 @@
             background: none;
             border: none;
             cursor: pointer;
-            padding: 0;
+            padding: 5px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -281,11 +292,11 @@
 </head>
 <body>
 
-    <div id="overlay">
-        <div class="overlay-text">pressssss enterr</div>
+    <div id="intro-overlay">
+        <div class="intro-text">presssssssssssss enterr</div>
     </div>
 
-    <audio id="audio-track" src="track.mp3" preload="metadata" loop></audio>
+    <audio id="audio-track" src="track.mp3" preload="metadata"></audio>
 
     <div class="container">
         <div class="avatar-wrapper">
@@ -308,25 +319,21 @@
         </div>
 
         <div class="advanced-player">
-            <div class="track-info" id="track-name">onda andar — prop hunt</div>
-            
+            <div class="track-info" id="track-title">onda andar - prop hunt</div>
             <div class="player-controls-row">
-                <span class="time-stamp" id="current-time">0:00</span>
+                <div class="time-stamp" id="current-time">0:00</div>
                 
                 <div class="progress-bar-container" id="progress-container">
-                    <div class="progress-bar-fill" id="progress-fill"></div>
+                    <div class="progress-bar-bg">
+                        <div class="progress-bar-fill" id="progress-fill"></div>
+                    </div>
                 </div>
                 
-                <span class="time-stamp" id="duration-time">0:00</span>
+                <div class="time-stamp" id="duration-time">0:00</div>
                 
                 <div class="buttons-group">
-                    <button class="player-btn main-toggle" id="play-btn" title="Воспроизведение">
-                        <svg viewBox="0 0 24 24" id="play-icon" style="display: none;">
-                            <path d="M8 5v14l11-7z"/>
-                        </svg>
-                        <svg viewBox="0 0 24 24" id="pause-icon">
-                            <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
-                        </svg>
+                    <button class="player-btn main-toggle" id="play-btn">
+                        <svg id="play-icon" viewBox="0 0 24 24"><path id="svg-path" d="M8 5v14l11-7z"/></svg>
                     </button>
                 </div>
             </div>
@@ -336,79 +343,139 @@
     <script>
         const audio = document.getElementById('audio-track');
         const playBtn = document.getElementById('play-btn');
-        const playIcon = document.getElementById('play-icon');
-        const pauseIcon = document.getElementById('pause-icon');
+        const svgPath = document.getElementById('svg-path');
         const progressContainer = document.getElementById('progress-container');
         const progressFill = document.getElementById('progress-fill');
         const currentTimeEl = document.getElementById('current-time');
         const durationTimeEl = document.getElementById('duration-time');
-        const overlay = document.getElementById('overlay');
+        const introOverlay = document.getElementById('intro-overlay');
 
-        function startAudio() {
-            audio.play().then(() => {
-                playIcon.style.display = 'none';
-                pauseIcon.style.display = 'block';
-                overlay.classList.add('hidden');
-            }).catch(error => {
-                console.log("Автозапуск заблокирован браузером. Ожидаем клика пользователя.");
-            });
+        const playPath = "M8 5v14l11-7z";
+        const pausePath = "M6 19h4V5H6v14zm8-14v14h4V5h-4z";
+
+        function formatTime(seconds) {
+            if (isNaN(seconds) || seconds === Infinity || seconds < 0) return "0:00";
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
         }
 
-        overlay.addEventListener('click', () => {
-            audio.play();
-            playIcon.style.display = 'none';
-            pauseIcon.style.display = 'block';
-            overlay.classList.add('hidden');
-        });
-
-        window.addEventListener('load', () => {
-            startAudio();
+        function updateDurationDisplay() {
             if (audio.duration) {
                 durationTimeEl.textContent = formatTime(audio.duration);
             }
+        }
+
+        introOverlay.addEventListener('click', () => {
+            introOverlay.classList.add('hidden');
+            audio.play()
+                .then(() => {
+                    svgPath.setAttribute('d', pausePath);
+                    updateDurationDisplay();
+                })
+                .catch(err => console.log("Ошибка автозапуска:", err));
         });
 
+        // Кнопка плей/пауза внутри плеера
         playBtn.addEventListener('click', () => {
             if (audio.paused) {
                 audio.play();
-                playIcon.style.display = 'none';
-                pauseIcon.style.display = 'block';
+                svgPath.setAttribute('d', pausePath);
+                updateDurationDisplay();
             } else {
                 audio.pause();
-                playIcon.style.display = 'block';
-                pauseIcon.style.display = 'none';
+                svgPath.setAttribute('d', playPath);
             }
         });
 
-        function formatTime(time) {
-            if (isNaN(time) || !isFinite(time)) return "0:00";
-            const minutes = Math.floor(time / 60);
-            const seconds = Math.floor(time % 60);
-            return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-        }
-
-        audio.addEventListener('loadedmetadata', () => {
-            durationTimeEl.textContent = formatTime(audio.duration);
-        });
-
-        audio.addEventListener('durationchange', () => {
-            durationTimeEl.textContent = formatTime(audio.duration);
-        });
+        audio.addEventListener('loadedmetadata', updateDurationDisplay);
+        audio.addEventListener('durationchange', updateDurationDisplay);
+        audio.addEventListener('playing', updateDurationDisplay);
 
         audio.addEventListener('timeupdate', () => {
-            if (audio.duration) {
-                const percent = (audio.currentTime / audio.duration) * 100;
-                progressFill.style.width = `${percent}%`;
+            if (!isRewinding) {
+                const percentage = (audio.currentTime / audio.duration) * 100;
+                progressFill.style.width = isNaN(percentage) ? '0%' : `${percentage}%`;
+                currentTimeEl.textContent = formatTime(audio.currentTime);
             }
-            currentTimeEl.textContent = formatTime(audio.currentTime);
         });
 
-        progressContainer.addEventListener('click', (e) => {
-            const width = progressContainer.clientWidth;
-            const clickX = e.offsetX;
-            const duration = audio.duration;
-            if (duration && isFinite(duration)) {
-                audio.currentTime = (clickX / width) * duration;
+        audio.addEventListener('ended', () => {
+            audio.currentTime = 0;
+            audio.play()
+                .then(() => {
+                    svgPath.setAttribute('d', pausePath);
+                })
+                .catch(err => {
+                    svgPath.setAttribute('d', playPath);
+                    progressFill.style.width = '0%';
+                    currentTimeEl.textContent = "0:00";
+                });
+        });
+
+        let isRewinding = false;
+
+        function setProgress(e) {
+            if (!audio.duration) return;
+            
+            const rect = progressContainer.getBoundingClientRect();
+            let clientX;
+            
+            if (e.touches && e.touches.length > 0) {
+                clientX = e.touches.clientX;
+            } else if (e.changedTouches && e.changedTouches.length > 0) {
+                clientX = e.changedTouches.clientX;
+            } else {
+                clientX = e.clientX;
+            }
+            
+            let clickX = clientX - rect.left;
+            let width = rect.width;
+            let percentage = (clickX / width) * 100;
+            
+            if (percentage < 0) percentage = 0;
+            if (percentage > 100) percentage = 100;
+            
+            progressFill.style.width = `${percentage}%`;
+            
+            const newTime = (percentage / 100) * audio.duration;
+            currentTimeEl.textContent = formatTime(newTime);
+            
+            return newTime;
+        }
+
+        progressContainer.addEventListener('mousedown', (e) => {
+            isRewinding = true;
+            const newTime = setProgress(e);
+            if(newTime !== undefined) audio.currentTime = newTime;
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (isRewinding) setProgress(e);
+        });
+
+        window.addEventListener('mouseup', (e) => {
+            if (isRewinding) {
+                isRewinding = false;
+                const newTime = setProgress(e);
+                if(newTime !== undefined) audio.currentTime = newTime;
+            }
+        });
+
+        progressContainer.addEventListener('touchstart', (e) => {
+            isRewinding = true;
+            setProgress(e);
+        }, { passive: true });
+
+        window.addEventListener('touchmove', (e) => {
+            if (isRewinding) setProgress(e);
+        }, { passive: true });
+
+        window.addEventListener('touchend', (e) => {
+            if (isRewinding) {
+                isRewinding = false;
+                const newTime = setProgress(e);
+                if(newTime !== undefined) audio.currentTime = newTime;
             }
         });
     </script>
